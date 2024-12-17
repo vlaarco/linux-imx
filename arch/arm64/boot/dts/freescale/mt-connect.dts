@@ -23,64 +23,6 @@
 		device_type = "memory";
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};
-
-	audio_codec_bt_sco: audio-codec-bt-sco {
-		compatible = "linux,bt-sco";
-		#sound-dai-cells = <1>;
-	};
-
-	wm8524: audio-codec {
-		#sound-dai-cells = <0>;
-		compatible = "wlf,wm8524";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_wlf>;
-		wlf,mute-gpios = <&gpio5 21 GPIO_ACTIVE_LOW>;
-	};
-
-	sound-bt-sco {
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "bt-sco-audio";
-		simple-audio-card,format = "dsp_a";
-		simple-audio-card,bitclock-inversion;
-		simple-audio-card,frame-master = <&btcpu>;
-		simple-audio-card,bitclock-master = <&btcpu>;
-
-		btcpu: simple-audio-card,cpu {
-			sound-dai = <&sai2>;
-			dai-tdm-slot-num = <2>;
-			dai-tdm-slot-width = <16>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&audio_codec_bt_sco 1>;
-		};
-	};
-
-	sound-wm8524 {
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "wm8524-audio";
-		simple-audio-card,format = "i2s";
-		simple-audio-card,frame-master = <&cpudai>;
-		simple-audio-card,bitclock-master = <&cpudai>;
-		simple-audio-card,widgets =
-		"Line", "Left Line Out Jack",
-		"Line", "Right Line Out Jack";
-		simple-audio-card,routing =
-		"Left Line Out Jack", "LINEVOUTL",
-		"Right Line Out Jack", "LINEVOUTR";
-
-		cpudai: simple-audio-card,cpu {
-			sound-dai = <&sai3>;
-			dai-tdm-slot-num = <2>;
-			dai-tdm-slot-width = <32>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&wm8524>;
-			clocks = <&clk IMX8MM_CLK_SAI3_ROOT>;
-		};
-	};
-
 };
 
 &A53_0 {
@@ -100,21 +42,6 @@
 };
 
 
-&ecspi2 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_ecspi2 &pinctrl_ecspi2_cs>;
-	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
-	status = "okay";
-
-	spidev0: spi@0 {
-		reg = <0>;
-		compatible = "rohm,dh2228fv";
-		spi-max-frequency = <500000>;
-	};
-};
-
 &fec1 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_fec1>;
@@ -128,15 +55,16 @@
 		#size-cells = <0>;
 
 		ethphy: ethernet-phy@1 {
-			compatible = "ethernet-phy-id0022.1642",
+			compatible = "ethernet-phy-id0022.1640",
 			"ethernet-phy-ieee802.3-c22";
+			pinctrl-0 = <&pinctrl_ethphy>;
+			pinctrl-names = "default";
 			interrupt-parent = <&gpio5>;
 			interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
 			reg = <1>;
 			reset-assert-us = <1000>;
-			/* RESET_N signal rise time ~100ms */
-			reset-deassert-us = <120000>;
-			phy-reset-gpios = <&gpio5 4 GPIO_ACTIVE_LOW>;
+			reset-deassert-us = <1000>;
+			status = "okay";
 		};
 	};
 };
@@ -353,68 +281,52 @@
 };
 
 &iomuxc {
-	pinctrl_ecspi2: ecspi2grp {
-		fsl,pins = <
-		MX8MM_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK		0x82
-		MX8MM_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI		0x82
-		MX8MM_IOMUXC_ECSPI2_MISO_ECSPI2_MISO		0x82
-		>;
-	};
-
-	pinctrl_ecspi2_cs: ecspi2csgrp {
-		fsl,pins = <
-		MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13		0x40000
-		>;
-	};
-
 	pinctrl_fec1: fec1grp {
 		fsl,pins =
-			<MX8MM_IOMUXC_ENET_MDC_ENET1_MDC		0x3>,
-			<MX8MM_IOMUXC_ENET_MDIO_ENET1_MDIO		0x3>,
-			<MX8MM_IOMUXC_ENET_RD0_ENET1_RGMII_RD0		0x91>,
-			<MX8MM_IOMUXC_ENET_RD1_ENET1_RGMII_RD1		0x91>,
-			<MX8MM_IOMUXC_ENET_RD2_ENET1_RGMII_RD2		0x91>,
-			<MX8MM_IOMUXC_ENET_RD3_ENET1_RGMII_RD3		0x91>,
-			<MX8MM_IOMUXC_ENET_RXC_ENET1_RGMII_RXC		0x91>,
-			<MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91>,
-			<MX8MM_IOMUXC_ENET_TD0_ENET1_RGMII_TD0		0x1f>,
-			<MX8MM_IOMUXC_ENET_TD1_ENET1_RGMII_TD1		0x1f>,
-			<MX8MM_IOMUXC_ENET_TD2_ENET1_RGMII_TD2		0x1f>,
-			<MX8MM_IOMUXC_ENET_TD3_ENET1_RGMII_TD3		0x1f>,
-			<MX8MM_IOMUXC_ENET_TXC_ENET1_RGMII_TXC		0x1f>,
-			<MX8MM_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x1f>,
-			<MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10		0x146>;
+		<MX8MM_IOMUXC_ENET_MDC_ENET1_MDC		0x3>,
+		<MX8MM_IOMUXC_ENET_MDIO_ENET1_MDIO		0x3>,
+		<MX8MM_IOMUXC_ENET_RD0_ENET1_RGMII_RD0		0x91>,
+		<MX8MM_IOMUXC_ENET_RD1_ENET1_RGMII_RD1		0x91>,
+		<MX8MM_IOMUXC_ENET_RD2_ENET1_RGMII_RD2		0x91>,
+		<MX8MM_IOMUXC_ENET_RD3_ENET1_RGMII_RD3		0x91>,
+		<MX8MM_IOMUXC_ENET_RXC_ENET1_RGMII_RXC		0x91>,
+		<MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91>,
+		<MX8MM_IOMUXC_ENET_TD0_ENET1_RGMII_TD0		0x1f>,
+		<MX8MM_IOMUXC_ENET_TD1_ENET1_RGMII_TD1		0x1f>,
+		<MX8MM_IOMUXC_ENET_TD2_ENET1_RGMII_TD2		0x1f>,
+		<MX8MM_IOMUXC_ENET_TD3_ENET1_RGMII_TD3		0x1f>,
+		<MX8MM_IOMUXC_ENET_TXC_ENET1_RGMII_TXC		0x1f>,
+		<MX8MM_IOMUXC_ENET_TX_CTL_ENET1_RGMII_TX_CTL	0x1f>;
 	};
 
 	pinctrl_fec1_sleep: fec1-sleepgrp {
 		fsl,pins =
-			<MX8MM_IOMUXC_ENET_MDC_ENET1_MDC		0x3>,
-			<MX8MM_IOMUXC_ENET_MDIO_ENET1_MDIO		0x3>,
-			<MX8MM_IOMUXC_ENET_RD0_ENET1_RGMII_RD0		0x91>,
-			<MX8MM_IOMUXC_ENET_RD1_ENET1_RGMII_RD1		0x91>,
-			<MX8MM_IOMUXC_ENET_RD2_ENET1_RGMII_RD2		0x91>,
-			<MX8MM_IOMUXC_ENET_RD3_ENET1_RGMII_RD3		0x91>,
-			<MX8MM_IOMUXC_ENET_RXC_ENET1_RGMII_RXC		0x91>,
-			<MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91>,
-			<MX8MM_IOMUXC_ENET_TD0_GPIO1_IO21		0x1f>,
-			<MX8MM_IOMUXC_ENET_TD1_GPIO1_IO20		0x1f>,
-			<MX8MM_IOMUXC_ENET_TD2_GPIO1_IO19		0x1f>,
-			<MX8MM_IOMUXC_ENET_TD3_GPIO1_IO18		0x1f>,
-			<MX8MM_IOMUXC_ENET_TXC_GPIO1_IO23		0x1f>,
-			<MX8MM_IOMUXC_ENET_TX_CTL_GPIO1_IO22		0x1f>,
-			<MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10		0x106>;
+		<MX8MM_IOMUXC_ENET_MDC_ENET1_MDC		0x3>,
+		<MX8MM_IOMUXC_ENET_MDIO_ENET1_MDIO		0x3>,
+		<MX8MM_IOMUXC_ENET_RD0_ENET1_RGMII_RD0		0x91>,
+		<MX8MM_IOMUXC_ENET_RD1_ENET1_RGMII_RD1		0x91>,
+		<MX8MM_IOMUXC_ENET_RD2_ENET1_RGMII_RD2		0x91>,
+		<MX8MM_IOMUXC_ENET_RD3_ENET1_RGMII_RD3		0x91>,
+		<MX8MM_IOMUXC_ENET_RXC_ENET1_RGMII_RXC		0x91>,
+		<MX8MM_IOMUXC_ENET_RX_CTL_ENET1_RGMII_RX_CTL	0x91>,
+		<MX8MM_IOMUXC_ENET_TD0_GPIO1_IO21		0x1f>,
+		<MX8MM_IOMUXC_ENET_TD1_GPIO1_IO20		0x1f>,
+		<MX8MM_IOMUXC_ENET_TD2_GPIO1_IO19		0x1f>,
+		<MX8MM_IOMUXC_ENET_TD3_GPIO1_IO18		0x1f>,
+		<MX8MM_IOMUXC_ENET_TXC_GPIO1_IO23		0x1f>,
+		<MX8MM_IOMUXC_ENET_TX_CTL_GPIO1_IO22		0x1f>;
 	};
 
+	pinctrl_ethphy: dhcom-ethphy-grp {
+		fsl,pins = <
+		MX8MM_IOMUXC_SPDIF_TX_GPIO5_IO3			0x1c4
+		MX8MM_IOMUXC_SPDIF_RX_GPIO5_IO4			0x1c4
+		>;
+	};
 
 	pinctrl_ir: irgrp {
 		fsl,pins = <
 		MX8MM_IOMUXC_GPIO1_IO13_GPIO1_IO13              0x4f
-		>;
-	};
-
-	pinctrl_gpio_wlf: gpiowlfgrp {
-		fsl,pins = <
-		MX8MM_IOMUXC_I2C4_SDA_GPIO5_IO21	0xd6
 		>;
 	};
 
