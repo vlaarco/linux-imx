@@ -253,12 +253,22 @@
 	samsung,picophy-dc-vol-level-adjust = <7>;
 	dr_mode = "otg";
 	usb-role-switch;
+	role-switch-default-mode = "host";
 	disable-over-current;
-	status = "enabled";
+	status = "okay";
 };
 
 &usbotg2 {
-	status="disabled";
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	samsung,picophy-pre-emp-curr-control = <3>;
+	samsung,picophy-dc-vol-level-adjust = <7>;
+	dr_mode = "otg";
+	usb-role-switch;
+	role-switch-default-mode = "host";
+	disable-over-current;
+	status = "okay";
 };
 
 &usdhc3 {
