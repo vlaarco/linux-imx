@@ -23,6 +23,37 @@
 		device_type = "memory";
 		reg = <0x0 0x40000000 0 0x80000000>;
 	};
+
+	ak4458_reset: gpio-reset {
+		compatible = "gpio-reset";
+		reset-gpios = <&gpio4 28 GPIO_ACTIVE_LOW>;
+		#reset-cells = <0>;
+		initially-in-reset;
+	};
+
+	sound-ak4458 {
+		compatible = "fsl,imx-audio-card";
+		model = "ak4458-audio";
+		pri-dai-link {
+			link-name = "akcodec";
+			format = "i2s";
+			fsl,mclk-equal-bclk;
+			cpu {
+				sound-dai = <&sai3>;
+			};
+			codec {
+				sound-dai = <&ak4458>;
+			};
+		};
+	};
+
+	reg_ldo_vcc: regulator-ldo-vcc {
+		compatible = "regulator-fixed";
+		regulator-name = "ldo_vcc_3v3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
 };
 
 &A53_0 {
@@ -204,6 +235,15 @@
 	sda-gpios = <&gpio5 17 GPIO_ACTIVE_HIGH>;
 	status = "okay";
 
+	ak4458: ak4458@10 {
+		#sound-dai-cells = <0>;
+		sound-name-prefix = "0";
+		compatible = "asahi-kasei,ak4458";
+		reg = <0x10>;
+		resets = <&ak4458_reset>;
+		AVDD-supply = <&reg_ldo_vcc>;
+		DVDD-supply = <&reg_ldo_vcc>;
+	};
 };
 
 &i2c3 {
@@ -213,16 +253,6 @@
 	pinctrl-1 = <&pinctrl_i2c3_gpio>;
 	scl-gpios = <&gpio5 18 GPIO_ACTIVE_HIGH>;
 	sda-gpios = <&gpio5 19 GPIO_ACTIVE_HIGH>;
-	status = "okay";
-};
-
-&sai2 {
-	#sound-dai-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_sai2>;
-	assigned-clocks = <&clk IMX8MM_CLK_SAI2>;
-	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
-	assigned-clock-rates = <24576000>;
 	status = "okay";
 };
 
@@ -382,18 +412,21 @@
 		>;
 	};
 
-	pinctrl_pmic: pmicirqgrp {
+	pinctrl_pdm: pdmgrp {
 		fsl,pins = <
-		MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x141
+			MX8MM_IOMUXC_SAI5_MCLK_SAI5_MCLK	0xd6
+			MX8MM_IOMUXC_SAI5_RXC_PDM_CLK		0xd6
+			MX8MM_IOMUXC_SAI5_RXFS_SAI5_RX_SYNC	0xd6
+			MX8MM_IOMUXC_SAI5_RXD0_PDM_DATA0	0xd6
+			MX8MM_IOMUXC_SAI5_RXD1_PDM_DATA1	0xd6
+			MX8MM_IOMUXC_SAI5_RXD2_PDM_DATA2	0xd6
+			MX8MM_IOMUXC_SAI5_RXD3_PDM_DATA3	0xd6
 		>;
 	};
 
-	pinctrl_sai2: sai2grp {
+	pinctrl_pmic: pmicirqgrp {
 		fsl,pins = <
-		MX8MM_IOMUXC_SAI2_TXC_SAI2_TX_BCLK      0xd6
-		MX8MM_IOMUXC_SAI2_TXFS_SAI2_TX_SYNC     0xd6
-		MX8MM_IOMUXC_SAI2_TXD0_SAI2_TX_DATA0    0xd6
-		MX8MM_IOMUXC_SAI2_RXD0_SAI2_RX_DATA0    0xd6
+		MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x141
 		>;
 	};
 
