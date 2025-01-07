@@ -116,19 +116,6 @@
 			pwms = <&pwm1 0 50000 0>;
 		};
 	};
-
-	sw_keys {
-		compatible = "gpio-keys";
-
-		sw1: volume_mute {
-			label = "Volume Mute";
-			gpios = <&gpio4 30 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_MUTE>;
-			interrupt-parent = <&gpio4>;
-			interrupts = <30 IRQ_TYPE_LEVEL_LOW>;
-		};
-	};
-
 };
 
 &A53_0 {
@@ -350,6 +337,19 @@
 	status = "okay";
 };
 
+&ecspi2 {
+	status = "okay";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>;
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
+
+	spidev1: spi@0 {
+		reg = <0>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <500000>;
+	};
+};
+
 &uart2 { /* console */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
@@ -505,6 +505,18 @@
 		>;
 	};
 
+	pinctrl_pdm: pdmgrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI5_MCLK_SAI5_MCLK	0xd6
+			MX8MM_IOMUXC_SAI5_RXC_PDM_CLK		0xd6
+			MX8MM_IOMUXC_SAI5_RXFS_SAI5_RX_SYNC	0xd6
+			MX8MM_IOMUXC_SAI5_RXD0_PDM_DATA0	0xd6
+			MX8MM_IOMUXC_SAI5_RXD1_PDM_DATA1	0xd6
+			MX8MM_IOMUXC_SAI5_RXD2_PDM_DATA2	0xd6
+			MX8MM_IOMUXC_SAI5_RXD3_PDM_DATA3	0xd6
+		>;
+	};
+
 	pinctrl_pmic: pmicirqgrp {
 		fsl,pins = <
 		MX8MM_IOMUXC_GPIO1_IO03_GPIO1_IO3		0x141
@@ -530,6 +542,17 @@
 		fsl,pins = <
 		MX8MM_IOMUXC_UART2_RXD_UART2_DCE_RX		0x140
 		MX8MM_IOMUXC_UART2_TXD_UART2_DCE_TX		0x140
+		>;
+	};
+
+	pinctrl_ecspi2: ecspi2grp {
+		fsl,pins = <
+		MX8MM_IOMUXC_ECSPI2_MISO_ECSPI2_MISO		0x82
+		MX8MM_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI		0x82
+		MX8MM_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK		0x82
+		MX8MM_IOMUXC_ECSPI2_SS0_ECSPI2_SS0		0x82
+		MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13		0x140 /* ECSPI2 NSS */
+		MX8MM_IOMUXC_SAI3_RXC_GPIO4_IO29		0x82 /* ECSPI2 INT */
 		>;
 	};
 
@@ -591,6 +614,12 @@
 	pinctrl_backlight: backlightgrp {
 		fsl,pins = <
 		MX8MM_IOMUXC_GPIO1_IO01_PWM1_OUT		0x06
+		>;
+	};
+
+	pinctrl_pwm_led: pwmledgrp {
+		fsl,pins = <
+		MX8MM_IOMUXC_SPDIF_EXT_CLK_PWM1_OUT	0x16
 		>;
 	};
 
