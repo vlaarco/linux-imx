@@ -5,6 +5,7 @@
 
 /dts-v1/;
 
+#include <dt-bindings/leds/common.h>
 #include <dt-bindings/usb/pd.h>
 #include "imx8mm.dtsi"
 
@@ -52,6 +53,80 @@
 		regulator-name = "ldo_vcc_3v3";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+
+		led-1 {
+			label = "ETH_GB_SEL";
+			gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-2 {
+			label = "LED1_GREEN";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio1 8 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-3 {
+			label = "LED2_GREEN";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio1 9 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-4 {
+			label = "LED3_GREEN";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-5 {
+			label = "LED4_DUAL_GREEN";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio1 13 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-6 {
+			label = "LED4_DUAL_YELLOW";
+			color = <LED_COLOR_ID_YELLOW>;
+			gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-7 {
+			label = "LED5_DUAL_GREEN";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio1 14 GPIO_ACTIVE_HIGH>;
+		};
+
+		led-8 {
+			label = "LED5_DUAL_RED";
+			color = <LED_COLOR_ID_RED>;
+			gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	pwm-leds {
+		compatible = "pwm-leds";
+
+		led-1 {
+			label = "PWM_MEMBRANE";
+			function = LED_FUNCTION_STATUS;
+			max-brightness = <248>;
+			pwms = <&pwm1 0 50000 0>;
+		};
+	};
+
+	sw_keys {
+		compatible = "gpio-keys";
+
+		sw1: volume_mute {
+			label = "Volume Mute";
+			gpios = <&gpio4 30 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_MUTE>;
+			interrupt-parent = <&gpio4>;
+			interrupts = <30 IRQ_TYPE_LEVEL_LOW>;
+		};
 	};
 
 };
@@ -266,6 +341,12 @@
 };
 
 &snvs_pwrkey {
+	status = "okay";
+};
+
+&pwm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm_led>;
 	status = "okay";
 };
 
@@ -510,6 +591,12 @@
 	pinctrl_backlight: backlightgrp {
 		fsl,pins = <
 		MX8MM_IOMUXC_GPIO1_IO01_PWM1_OUT	0x06
+		>;
+	};
+
+	pinctrl_pwm_led: pwmledgrp {
+		fsl,pins = <
+		MX8MM_IOMUXC_SPDIF_EXT_CLK_PWM1_OUT	0x16
 		>;
 	};
 };
