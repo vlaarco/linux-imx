@@ -34,6 +34,8 @@
 
 	leds {
 		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_led>;
 
 		led-1 {
 			label = "ETH_GB_SEL";
@@ -596,6 +598,12 @@
 	pinctrl_pwm_led: pwmledgrp {
 		fsl,pins = <
 		MX8MM_IOMUXC_SPDIF_EXT_CLK_PWM1_OUT	0x16
+		>;
+	};
+
+	pinctrl_gpio_led: gpio-led-grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO11_GPIO1_IO11		0x186
 		>;
 	};
 };
