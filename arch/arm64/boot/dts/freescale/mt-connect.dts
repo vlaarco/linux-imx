@@ -278,6 +278,41 @@
 
 };
 
+&gpio1 {
+	gpio-line-names = "", "DPM_COPRO_EN", "", "", "", "", "ETH_GB_SEL", "",
+		"LED1_GREEN", "LED2_GREEN", "LED3_GREEN", "LED4_DUAL_YELLOW", "LED5_DUAL_RED", "LED4_DUAL_GREEN", "LED5_DUAL_GREEN", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "";
+};
+
+&gpio2 {
+	gpio-line-names = "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "";
+};
+
+&gpio3 {
+	gpio-line-names = "", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "", "", "", "";
+};
+
+&gpio4 {
+	gpio-line-names = "", "", "BRIDGE_RXD0", "BRIDGE_RXD1", "S_BRIDGE_RXD2", "S_BRIDGE_RXD3", "", "",
+		"", "", "BRIDGE_LRCLK", "BRIDGE_BCLK", "BRIDGE_TXD0", "BRIDGE_TXD1", "S_BRIDGE_TXD2", "S_BRIDGE_TXD3",
+		"", "", "", "", "", "", "", "",
+		"", "", "", "", "HP_DAC_PDN_N", "SPI2_INT", "HP_DAC_I2CFIL", "DPM_HP_DAC_LRCK";
+};
+
+&gpio5 {
+	gpio-line-names = "DPM_HP_DAC_BCLK", "DPM_HP_DAC_SD", "DPM_HP_DAC_MCLK", "", "", "PWM_MEMBRANE", "", "",
+		"", "", "SPI2_SCK", "SPI2_MOSI", "SPI2_MISO", "SPI2_NSS", "", "",
+		"DPM_I2C2_SCL", "DPM_I2C2_SDA", "", "", "DPM_I2C4_SCL", "DPM_I2C4_SDA", "", "",
+		"DPM_CONSOLE_RX", "DPM_CONSOLE_TX", "DPM_DEBUG_RX", "DPM_DEBUG_TX", "", "", "", "";
+};
+
 &i2c4 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default", "gpio";
